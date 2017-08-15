@@ -183,7 +183,8 @@
 
     $.each(this.validators, $.proxy(function (key, validator) {
       var error = null
-      if ((getValue($el) || $el.attr('required')) &&
+      var value = getValue($el)
+      if ((value === '' || value || $el.attr('required')) &&
           ($el.attr('data-' + key) !== undefined || key == 'native') &&
           (error = validator.call(this, $el))) {
          error = getErrorMessage(key) || error
@@ -195,8 +196,8 @@
       this.defer($el, function () {
         var data = {}
         data[$el.attr('name')] = getValue($el)
-        $.get($el.attr('data-remote'), data)
-          .fail(function (jqXHR, textStatus, error) { errors.push(getErrorMessage('remote') || error) })
+        $.getJSON($el.attr('data-remote'), data)
+          .done(function (data, textStatus, jqXHR) { if (data.errormsg) errors.push(data.errormsg) })
           .always(function () { deferred.resolve(errors)})
       })
     } else deferred.resolve(errors)
@@ -248,6 +249,8 @@
       && $feedback.removeClass(this.options.feedback.success)
       && $feedback.addClass(this.options.feedback.error)
       && $group.removeClass('has-success')
+      
+      this.$element.trigger($.Event('errorschanged.bs.validator', {relatedTarget: $el[0]}))
   }
 
   Validator.prototype.clearErrors = function ($el) {
@@ -264,6 +267,8 @@
       && getValue($el)
       && $feedback.addClass(this.options.feedback.success)
       && $group.addClass('has-success')
+      
+      this.$element.trigger($.Event('errorschanged.bs.validator', {relatedTarget: $el[0]}))
   }
 
   Validator.prototype.hasErrors = function () {
