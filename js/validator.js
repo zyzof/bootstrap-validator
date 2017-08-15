@@ -203,7 +203,8 @@
 
     $.each(this.validators, $.proxy(function (key, validator) {
       var error = null
-      if ((getValue($el) || $el.attr('required')) &&
+      var value = getValue($el)
+      if ((value === '' || value || $el.attr('required')) &&
           ($el.attr('data-' + key) !== undefined || key == 'native') &&
           (error = validator.call(this, $el))) {
          error = getErrorMessage(key) || error
