@@ -216,9 +216,11 @@
       this.defer($el, function () {
         var data = {}
         data[$el.attr('name')] = getValue($el)
-        $.getJSON($el.attr('data-remote'), data)
+        if ($el.attr('data-remote')) {
+          $.getJSON($el.attr('data-remote'), data)
           .done(function (data, textStatus, jqXHR) { if (data.errormsg) errors.push(data.errormsg) })
           .always(function () { deferred.resolve(errors)})
+        }
       })
     } else deferred.resolve(errors)
 
